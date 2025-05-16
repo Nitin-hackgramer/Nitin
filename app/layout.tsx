@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
+import ArcadeCursor from '@/components/ArcadeCursor';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,7 +29,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
             <head>
-            <link rel="icon" href="/Portfolio_logo.png" />
+            <link rel="icon" href="/portfolio_logo.png" />
             </head>
           <div className="flex min-h-screen flex-col">
             <Header />
@@ -37,6 +38,10 @@ export default function RootLayout({
           </div>
           <Toaster />
         </ThemeProvider>
+            <>
+      <ArcadeCursor />
+      {children}
+    </>
       </body>
     </html>
   );
