@@ -28,7 +28,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
             <head>
-            <link rel="icon" href="/portfolio_logo.png" />
+            <link rel="icon" href="/Portfolio_logo.png" />
             </head>
           <div className="flex min-h-screen flex-col">
             <Header />
