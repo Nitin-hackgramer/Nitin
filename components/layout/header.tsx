@@ -49,7 +49,7 @@ export default function Header() {
           <div className="flex lg:flex-1">
             <Link href="/" className="flex items-center font-bold text-xl">
               <img
-              src="/portfolio_logo.webp"
+              src="/Portfolio_logo.webp"
               alt="Portfolio Logo"
               className="h-8 w-8 mr-2"
               />
