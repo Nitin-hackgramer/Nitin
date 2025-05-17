@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Menu, Moon, Sun, ChevronRight } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { motion } from "framer-motion";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -21,6 +22,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   
   // Check if the current path matches the nav item
   const isActive = (path: string) => pathname === path;
@@ -35,98 +37,174 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const fadeIn = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
-    <header
+    <motion.header
+      initial="hidden"
+      animate="visible"
+      variants={fadeIn}
+      transition={{ duration: 0.5 }}
       className={cn(
         "fixed top-0 z-40 w-full transition-all duration-300",
         isScrolled
-          ? "bg-background/80 backdrop-blur-md border-b shadow-sm py-3"
+          ? "bg-background/80 backdrop-blur-xl border-b shadow-sm py-3"
           : "bg-transparent py-5"
       )}
     >
-      <div className="container-custom">
+      <div className="container max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between">
-          <div className="flex lg:flex-1">
+          {/* Logo */}
+          <motion.div 
+            className="flex lg:flex-1"
+            whileHover={{ scale: 1.03 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          >
             <Link href="/" className="flex items-center font-bold text-xl">
-              <img
-              src="/Portfolio_logo.webp"
-              alt="Portfolio Logo"
-              className="h-8 w-8 mr-2"
-              />
-              <span className="text-primary">Nitin </span>
-              <span className="text-foreground">Sharma</span>
-              <span className="text-accent">.</span>
+              <div className="relative h-10 w-10 mr-3 rounded-full bg-gradient-to-tr from-primary to-primary/30 flex items-center justify-center overflow-hidden">
+                <span className="text-background font-bold text-lg">N</span>
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-accent/20 opacity-70"></div>
+              </div>
+              <div className="flex flex-col -space-y-1">
+                <span className="text-primary font-semibold">Nitin</span>
+                <span className="text-foreground font-medium text-sm">Sharma<span className="text-accent">.</span></span>
+              </div>
             </Link>
-          </div>
+          </motion.div>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex md:gap-x-8">
+          <nav className="hidden md:flex md:gap-x-8 bg-background/30 backdrop-blur-md px-6 py-2 rounded-full shadow-sm">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary relative py-2",
-                  isActive(item.href) 
-                    ? "text-primary after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-primary"
-                    : "text-foreground/80"
-                )}
+                className="relative group"
+                onMouseEnter={() => setHoveredItem(item.name)}
+                onMouseLeave={() => setHoveredItem(null)}
               >
-                {item.name}
+                <span className={cn(
+                  "text-sm font-medium transition-colors relative z-10 py-2 px-1",
+                  isActive(item.href) 
+                    ? "text-primary"
+                    : "text-foreground/80 hover:text-primary"
+                )}>
+                  {item.name}
+                </span>
+                {(isActive(item.href) || hoveredItem === item.name) && (
+                  <motion.div 
+                    layoutId="navIndicator"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                )}
               </Link>
             ))}
           </nav>
           
+          {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              aria-label="Toggle theme"
-            >
-              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            </Button>
-            <Button asChild>
-              <Link href="/contact">Let's talk</Link>
-            </Button>
+            {/* Theme Toggle */}
+            <motion.div whileTap={{ scale: 0.9 }}>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                aria-label="Toggle theme"
+                className="rounded-full border-primary/20 hover:bg-primary/10"
+              >
+                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              </Button>
+            </motion.div>
+            
+            {/* CTA Button */}
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button asChild className="rounded-full px-6 font-medium">
+                <Link href="/contact" className="flex items-center gap-1">
+                  Let's talk <ChevronRight className="h-3 w-3 ml-1" />
+                </Link>
+              </Button>
+            </motion.div>
           </div>
           
           {/* Mobile Navigation */}
-          <div className="flex md:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="mr-2"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              aria-label="Toggle theme"
-            >
-              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            </Button>
+          <div className="flex md:hidden items-center">
+            <motion.div whileTap={{ scale: 0.9 }}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="mr-2"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                aria-label="Toggle theme"
+              >
+                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              </Button>
+            </motion.div>
             
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Open menu">
-                  <Menu className="h-5 w-5" />
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  aria-label="Open menu"
+                  className="rounded-full border-primary/20"
+                >
+                  <Menu className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right">
-                <div className="flex flex-col space-y-6 mt-8">
-                  {navigation.map((item) => (
-                    <Link
+              <SheetContent side="right" className="border-l-primary/10">
+                <div className="flex items-center mt-8 mb-8">
+                  <div className="h-10 w-10 mr-3 rounded-full bg-gradient-to-tr from-primary to-primary/30 flex items-center justify-center">
+                    <img src="/Portfolio_logo.webp" alt="Portfolio Logo" className="w-6 h-6" />
+                  </div>
+                  <div className="flex flex-col -space-y-1">
+                    <span className="text-primary font-semibold">Nitin</span>
+                    <span className="text-foreground font-medium text-sm">Sharma<span className="text-accent">.</span></span>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col space-y-1">
+                  {navigation.map((item, index) => (
+                    <motion.div
                       key={item.name}
-                      href={item.href}
-                      className={cn(
-                        "text-lg font-medium transition-colors hover:text-primary",
-                        isActive(item.href) ? "text-primary" : "text-foreground/80"
-                      )}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
                     >
-                      {item.name}
-                    </Link>
+                      <Link
+                        href={item.href}
+                        className={cn(
+                          "flex items-center py-3 px-4 rounded-lg transition-colors",
+                          isActive(item.href) 
+                            ? "bg-primary/10 text-primary font-medium" 
+                            : "text-foreground/80 hover:bg-accent/10 hover:text-accent"
+                        )}
+                      >
+                        <span className="text-lg">{item.name}</span>
+                        {isActive(item.href) && (
+                          <motion.div 
+                            layoutId="mobileNavIndicator"
+                            className="ml-auto"
+                          >
+                            <ChevronRight className="h-4 w-4 text-primary" />
+                          </motion.div>
+                        )}
+                      </Link>
+                    </motion.div>
                   ))}
-                  <Button asChild className="mt-4">
-                    <Link href="/contact">Let's talk</Link>
+                </div>
+                
+                <div className="mt-8">
+                  <Button asChild className="w-full rounded-lg">
+                    <Link href="/contact" className="flex items-center justify-center gap-2">
+                      Let's talk <ChevronRight className="h-4 w-4" />
+                    </Link>
                   </Button>
                 </div>
               </SheetContent>
@@ -134,6 +212,5 @@ export default function Header() {
           </div>
         </div>
       </div>
-    </header>
-  );
-}
+    </motion.header>
+  );}
