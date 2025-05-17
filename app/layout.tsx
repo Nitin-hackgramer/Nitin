@@ -10,8 +10,23 @@ import ArcadeCursor from '@/components/ArcadeCursor';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Nitin Sharma | Freelance Web Developer',
-  description: 'Nitin Sharma | Freelance web developer specializing in React, Next.js, and modern web technologies.',
+  title: 'Nitin Sharma | Professional Web Developer & Software Engineer',
+  description: 'Hire Nitin Sharma - Expert freelance web developer specializing in React, Next.js, TypeScript and modern web technologies. Building high-performance websites and web applications.',
+  keywords: ['Nitin Sharma', 'web developer', 'freelance developer', 'React developer', 'Next.js developer', 'full stack developer'],
+  authors: [{ name: 'Nitin Sharma' }],
+  creator: 'Nitin Sharma',
+  robots: 'index, follow',
+  openGraph: {
+    type: 'website',
+    title: 'Nitin Sharma | Professional Web Developer',
+    description: 'Experienced Freelance Web Developer with expertise in React, Next.js, and modern JavaScript frameworks.',
+    images: [{ url: '/portfolio_logo.webp' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Nitin Sharma | Web Developer',
+    description: 'Professional web development services by Nitin Sharma',
+  },
 };
 
 export default function RootLayout({
@@ -28,20 +43,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-            <head>
-            <link rel="icon" href="/portfolio_logo.png" />
-            </head>
           <div className="flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
           <Toaster />
+          <ArcadeCursor />
         </ThemeProvider>
-            <>
-      <ArcadeCursor />
-      {children}
-    </>
       </body>
     </html>
   );
