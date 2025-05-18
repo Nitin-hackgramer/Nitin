@@ -76,36 +76,36 @@ const experiences = [
     program: "YIIP Program",
     duration: "Summer 2023",
     description: "Participated in Young Innovator Internship Program focused on full-stack development using modern technologies. Collaborated with senior developers to build educational tech platforms.",
-    skills: ["Next.js", "Django", "Team Collaboration"]
+    skills: ["No-Code Development", "Extension Development", "Artificial Intelligence", "Team Collaboration"]
   }
 ];
 
 // HACKATHON DATA
 const hackathons = [
-  {
-    name: "Helping Hands Hackathon",
-    organizer: "TechForGood",
-    date: "March 2023",
-    achievement: "1st Place Winner",
-    description: "Developed a platform connecting elders and children with trusted assistants through location-based matching and verification systems.",
-    technologies: ["Next.js", "Django", "Tailwind CSS", "PostgreSQL"]
-  },
-  {
-    name: "CodeFest 2023",
-    organizer: "University Tech Alliance",
-    date: "October 2023",
-    achievement: "Top 5 Finalist",
-    description: "Built a real-time collaborative coding platform with live debugging capabilities.",
-    technologies: ["React", "Node.js", "Socket.io", "MongoDB"]
-  },
-  {
-    name: "DevHack 2024",
-    organizer: "Developer Community Network",
-    date: "February 2024",
-    achievement: "Best UI/UX Award",
-    description: "Created an AI-powered accessibility tool that translates websites for people with visual impairments.",
-    technologies: ["React", "Python", "TensorFlow", "Web Speech API"]
-  }
+    {
+        name: "HackSpire Hackathon", 
+        organizer: "Inderprastha Engineering College",
+        date: "December 2024", 
+        achievement: "Top 15 Finalist - Only App Development Project",
+        description: "Developed an Android application for patient appointment management, doctor schedule viewing, and on-device lung cancer prediction from X-ray images using Kotlin, XML, and TensorFlow Lite.",
+        technologies: ["XML", "Kotlin", "TensorFlow Lite", "Firebase Firestore", "Firebase Auth", "Google Cloud Healthcare API"]
+    },
+    {
+        name: "Python Park - The Hackathon",
+        organizer: "Compunnel Inc.",
+        date: "June 2024",
+        achievement: "Top 10 Finalist - My Very First Hackathon",
+        description: "Developed a resume extractor using Python and libraries like PDFPlumber and regular expressions to parse and extract information from PDF and DOCX files.",
+        technologies: ["Python", "PDFPlumber", "python-docx", "re"]
+    },
+    {
+        name: "Bharat Shiksha Expo 2024 Hackathon",
+        organizer: "Bharat Shiksha Expo",
+        date: "November 2024",
+        achievement: "Top 20 Finalist - Praised for Good Presentation",
+        description: "Developed a platform where users can build a basic landing page and generate a QR code. This helps individuals and small businesses like bakeries and kirana shops to go online in this era of the internet.",
+        technologies: ["React", "HTML", "CSS", "JavaScript"]
+    }
 ];
 
 // FEATURED PROJECTS WITH ADDITIONAL DETAILS
