@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+// import Image from "next/image"; // Available if you want to optimize local images further
 import { Menu, Moon, Sun, ChevronRight } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -21,25 +22,83 @@ const navigation = [
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme(); // theme can be 'system', resolvedTheme is 'light' or 'dark'
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  
+  const [mounted, setMounted] = useState(false);
+
+  // Effect to ensure component is mounted on the client before running theme-dependent logic
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Check if the current path matches the nav item
   const isActive = (path: string) => pathname === path;
 
-  // Handle scroll events
+  // Handle scroll events for header styling
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Handler for toggling the theme and notifying cursor system
+  const handleThemeToggle = () => {
+    if (!mounted) return; // Ensure we only toggle theme on the client
+    const newTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+
+    // Dispatch a custom event to notify other parts of the application (e.g., a custom cursor script)
+    // that the theme has changed. The custom cursor script would need to listen for this event
+    // (e.g., window.addEventListener('themechanged', callback))
+    // and update its appearance accordingly if it doesn't automatically react to the
+    // class/attribute change on the <html> element by next-themes.
+    if (typeof window !== 'undefined') {
+      // Using a brief timeout to allow next-themes to potentially update the DOM first.
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('themechanged', { detail: { theme: newTheme } }));
+      }, 0);
+    }
+  };
+
   const fadeIn = {
     hidden: { opacity: 0, y: -20 },
     visible: { opacity: 1, y: 0 }
+  };
+
+  // The theme toggle button (Sun/Moon)
+  const ThemeToggleButton = ({ isMobile = false }: { isMobile?: boolean }) => {
+    if (!mounted) {
+        return (
+            <div className={cn(
+                "h-9 w-9 rounded-full flex items-center justify-center", // Adjust size to match Button variant="icon"
+                isMobile ? "mr-2" : "",
+                isMobile ? "" : "border border-primary/20" // Mimic outline variant style
+            )}>
+                {/* Placeholder for SSR/hydration phase */}
+            </div>
+        );
+    }
+
+    return (
+      <motion.div whileTap={{ scale: 0.9 }} data-interactive-cursor="true">
+        <Button
+          variant={isMobile ? "ghost" : "outline"}
+          size="icon"
+          onClick={handleThemeToggle}
+          aria-label="Toggle theme"
+          className={cn(
+            isMobile ? "" : "rounded-full border-primary/20 hover:bg-primary/10",
+            isMobile ? "mr-2" : ""
+          )}
+        >
+          <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <span className="sr-only">Toggle theme</span>
+        </Button>
+      </motion.div>
+    );
   };
 
   return (
@@ -62,6 +121,7 @@ export default function Header() {
             className="flex lg:flex-1"
             whileHover={{ scale: 1.03 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            data-interactive-cursor="true"
           >
             <Link href="/" className="flex items-center font-bold text-xl">
               <div className="relative h-10 w-10 mr-3 rounded-full bg-gradient-to-tr from-primary to-primary/30 flex items-center justify-center overflow-hidden">
@@ -84,6 +144,7 @@ export default function Header() {
                 className="relative group"
                 onMouseEnter={() => setHoveredItem(item.name)}
                 onMouseLeave={() => setHoveredItem(null)}
+                data-interactive-cursor="true" 
               >
                 <span className={cn(
                   "text-sm font-medium transition-colors relative z-10 py-2 px-1",
@@ -108,22 +169,9 @@ export default function Header() {
           
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            {/* Theme Toggle */}
-            <motion.div whileTap={{ scale: 0.9 }}>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                aria-label="Toggle theme"
-                className="rounded-full border-primary/20 hover:bg-primary/10"
-              >
-                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              </Button>
-            </motion.div>
+            <ThemeToggleButton isMobile={false} /> {/* Desktop Theme Toggle */}
             
-            {/* CTA Button */}
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} data-interactive-cursor="true">
               <Button asChild className="rounded-full px-6 font-medium">
                 <Link href="/contact" className="flex items-center gap-1">
                   Let's talk <ChevronRight className="h-3 w-3 ml-1" />
@@ -134,22 +182,12 @@ export default function Header() {
           
           {/* Mobile Navigation */}
           <div className="flex md:hidden items-center">
-            <motion.div whileTap={{ scale: 0.9 }}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="mr-2"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                aria-label="Toggle theme"
-              >
-                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              </Button>
-            </motion.div>
+            <ThemeToggleButton isMobile={true} /> {/* Mobile Theme Toggle */}
             
             <Sheet>
               <SheetTrigger asChild>
                 <Button 
+                  data-interactive-cursor="true"
                   variant="outline" 
                   size="icon" 
                   aria-label="Open menu"
@@ -159,7 +197,7 @@ export default function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="border-l-primary/10">
-                <div className="flex items-center mt-8 mb-8">
+                <div className="flex items-center mt-8 mb-8" data-interactive-cursor="true">
                   <div className="h-10 w-10 mr-3 rounded-full bg-gradient-to-tr from-primary to-primary/30 flex items-center justify-center">
                     <img src="/Portfolio_logo.webp" alt="Portfolio Logo" className="w-6 h-6" />
                   </div>
@@ -178,6 +216,7 @@ export default function Header() {
                       transition={{ delay: index * 0.1 }}
                     >
                       <Link
+                        data-interactive-cursor="true"
                         href={item.href}
                         className={cn(
                           "flex items-center py-3 px-4 rounded-lg transition-colors",
@@ -189,7 +228,7 @@ export default function Header() {
                         <span className="text-lg">{item.name}</span>
                         {isActive(item.href) && (
                           <motion.div 
-                            layoutId="mobileNavIndicator"
+                            layoutId={`mobileNavIndicator-${item.name}`}
                             className="ml-auto"
                           >
                             <ChevronRight className="h-4 w-4 text-primary" />
@@ -201,7 +240,7 @@ export default function Header() {
                 </div>
                 
                 <div className="mt-8">
-                  <Button asChild className="w-full rounded-lg">
+                  <Button data-interactive-cursor="true" asChild className="w-full rounded-lg">
                     <Link href="/contact" className="flex items-center justify-center gap-2">
                       Let's talk <ChevronRight className="h-4 w-4" />
                     </Link>
@@ -213,4 +252,5 @@ export default function Header() {
         </div>
       </div>
     </motion.header>
-  );}
+  );
+}
