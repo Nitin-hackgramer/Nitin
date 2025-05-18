@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 import { Hero } from "@/components/home/hero"; 
+import { GlobalCursorShadow } from '@/components/GlobalCursorShadow';
+import TechOrbitCursor from '@/components/ArcadeCursor';
 import { ServicesPreview } from "@/components/home/services-preview";
 import { FeaturedProjects } from "@/components/home/featured-projects";
 import { TestimonialsSection } from "@/components/home/testimonials";
@@ -13,6 +15,8 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
+      <GlobalCursorShadow /> 
+      <TechOrbitCursor />
       <Hero /> 
       <ServicesPreview />
       <FeaturedProjects />
