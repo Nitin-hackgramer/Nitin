@@ -1,212 +1,86 @@
 "use client";
 
-import React, { useState, useEffect, useRef, CSSProperties, ElementType } from "react";
+import React, { useState, useEffect, useRef, ElementType } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Code, Pencil, Globe, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AnimatedText } from "@/components/ui/animated-text";
+import ArcadeCursor from "@/components/ArcadeCursor";
 
 const skills = [" Next.js", " React.js", " TypeScript", " Tailwind CSS", " UI/UX", " Node.js"];
 
-// Adaptive cursor component that changes based on surrounding context
-const AdaptiveCursor = () => {
-  const cursorRef = useRef<HTMLDivElement>(null);
-  const cursorShadowRef = useRef<HTMLDivElement>(null);
-  const [isHoveringInteractive, setIsHoveringInteractive] = useState(false);
-  const [cursorColor, setCursorColor] = useState({ r: 56, g: 189, b: 248 }); // Default sky blue
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Check if device is mobile
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768 || 
-                 ('ontouchstart' in window) || 
-                 (navigator.maxTouchPoints > 0));
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Skip cursor effects on mobile
-  if (isMobile) return null;
-
-  useEffect(() => {
-    const mainCursor = cursorRef.current;
-    const shadowCursor = cursorShadowRef.current;
-    if (!mainCursor || !shadowCursor) return;
-
-    // Initial setup - hide cursor and use transform for better performance
-    mainCursor.style.opacity = '0';
-    shadowCursor.style.opacity = '0';
-    document.documentElement.classList.add('custom-cursor-active');
-    
-    // Sample colors from underlying elements for adaptive effects
-    const sampleColors = (x: number, y: number) => {
-      // Get element under cursor (excluding our cursor elements)
-      const elements = document.elementsFromPoint(x, y).filter(el => 
-        el !== mainCursor && 
-        el !== shadowCursor && 
-        !el.classList.contains('cursor-element')
-      );
-      
-      if (elements.length > 0) {
-        const targetElement = elements[0];
-        const computedStyle = window.getComputedStyle(targetElement);
-        const bgColor = computedStyle.backgroundColor;
-        const textColor = computedStyle.color;
-        
-        // Parse color values - prioritize text color if it's not default
-        let colorToUse = textColor !== 'rgb(0, 0, 0)' ? textColor : bgColor;
-        
-        // Extract RGB values
-        const match = colorToUse.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-        if (match) {
-          setCursorColor({
-            r: parseInt(match[1], 10),
-            g: parseInt(match[2], 10),
-            b: parseInt(match[3], 10)
-          });
-        }
-      }
-    };
-
-    const onMouseMove = (event: MouseEvent) => {
-      const { clientX, clientY } = event;
-      
-      // Make cursors visible on first mouse move
-      if (mainCursor.style.opacity === '0') {
-        mainCursor.style.opacity = '1';
-        shadowCursor.style.opacity = '1';
-      }
-      
-      // Sample colors every few moves to avoid performance issues
-      if (Math.random() < 0.1) {  // Sample ~10% of the time
-        sampleColors(clientX, clientY);
-      }
-
-      // Super smooth animation with transform and requestAnimationFrame
-      requestAnimationFrame(() => {
-        // Main cursor follows immediately
-        mainCursor.style.transform = `translate3d(${clientX}px, ${clientY}px, 0) translate(-50%, -50%)`;
-        
-        // Shadow's target position is updated. CSS transition handles the smooth movement.
-        shadowCursor.style.transform = `translate3d(${clientX}px, ${clientY}px, 0) translate(-50%, -50%) scale(${isHoveringInteractive ? 1.5 : 1.2})`;
-      });
-
-      // Check if hovering interactive elements for size change
-      const target = event.target as HTMLElement;
-      if (target.closest('a, button, [role="button"], input, textarea, [data-cursor-interactive]')) {
-        setIsHoveringInteractive(true);
-      } else {
-        setIsHoveringInteractive(false);
-      }
-    };
-
-    window.addEventListener("mousemove", onMouseMove);
-    
-    // Hide system cursor
-    document.body.style.cursor = 'none';
-
-    return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      document.body.style.cursor = 'auto';
-      document.documentElement.classList.remove('custom-cursor-active');
-    };
-  }, [isHoveringInteractive]); // isHoveringInteractive dependency is important for scale changes
-
-  // Apply dynamic styles based on sampled colors
-  const mainCursorStyle: CSSProperties = {
-    width: isHoveringInteractive ? '18px' : '8px',
-    height: isHoveringInteractive ? '18px' : '8px',
-    backgroundColor: isHoveringInteractive 
-      ? `rgba(${cursorColor.r}, ${cursorColor.g}, ${cursorColor.b}, 0.85)`
-      : 'rgba(56, 189, 248, 0.9)',
-    border: isHoveringInteractive 
-      ? `1px solid rgba(${cursorColor.r}, ${cursorColor.g}, ${cursorColor.b}, 0.3)` 
-      : '1px solid rgba(255, 255, 255, 0.6)',
-    transition: 'width 0.2s ease-out, height 0.2s ease-out, background-color 0.3s ease-out, border 0.3s ease-out',
-    zIndex: 9999,
-    pointerEvents: 'none',
-    borderRadius: '50%',
-    position: 'fixed',
-    willChange: 'transform', // Main cursor transform is instant, but width/height/color transitions
-    mixBlendMode: 'difference' as React.CSSProperties['mixBlendMode'],
-  };
-  
-  const shadowCursorStyle: CSSProperties = {
-    width: isHoveringInteractive ? '36px' : '24px',
-    height: isHoveringInteractive ? '36px' : '24px',
-    backgroundColor: 'transparent',
-    boxShadow: `0 0 20px 4px rgba(${cursorColor.r}, ${cursorColor.g}, ${cursorColor.b}, 0.4)`,
-    zIndex: 9998,
-    pointerEvents: 'none' as React.CSSProperties['pointerEvents'],
-    borderRadius: '50%',
-    position: 'fixed',
-    willChange: 'transform, width, height, box-shadow', // Advise browser about upcoming changes
-    transition: 'transform 0.2s ease-out, width 0.2s ease-out, height 0.2s ease-out, box-shadow 0.3s ease-out', // Added smooth transitions
-  };
-
-  return (
-    <>
-      <div ref={cursorRef} className="cursor-element" style={mainCursorStyle} />
-      <div ref={cursorShadowRef} className="cursor-element" style={shadowCursorStyle} />
-      <style jsx global>{`
-        .custom-cursor-active * {
-          cursor: none !important;
-        }
-      `}</style>
-    </>
-  );
-};
-
 export function Hero() {
   const [currentSkillIndex, setCurrentSkillIndex] = useState(0);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const heroRef = useRef<HTMLDivElement>(null); // Corrected ref type
+  // Using a ref to store the latest mouse position without triggering re-renders
+  const latestMousePosition = useRef({ x: 0, y: 0 });
+  const heroRef = useRef<HTMLDivElement>(null);
+  // Ref for the specific element that creates the cursor shadow effect
+  const cursorShadowRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
-  
+
   // Check if device is mobile for responsive adaptations
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768 || 
-                 ('ontouchstart' in window) || 
-                 (navigator.maxTouchPoints > 0));
+      setIsMobile(window.innerWidth < 768 ||
+                  ('ontouchstart' in window) ||
+                  (navigator.maxTouchPoints > 0));
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  
+
+  // Effect for cycling through skills text
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSkillIndex((prevIndex) => (prevIndex + 1) % skills.length);
     }, 2500);
-    
+
     return () => clearInterval(interval);
   }, []);
-  
+
+  // Optimized mouse move effect using requestAnimationFrame
   useEffect(() => {
+    // Only apply the effect on non-mobile devices
     if (isMobile) return;
-    
-    const handleMouseMove = (e: MouseEvent) => {
-      if (heroRef.current) {
+
+    let animationFrameId: number;
+
+    // Function to update the cursor shadow's position, called by requestAnimationFrame
+    const updateCursorShadow = () => {
+      if (cursorShadowRef.current && heroRef.current) {
+        // Get the bounding rectangle of the hero section
         const rect = heroRef.current.getBoundingClientRect();
-        setMousePosition({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top
-        });
+        // Calculate mouse position relative to the hero section
+        const x = latestMousePosition.current.x - rect.left;
+        const y = latestMousePosition.current.y - rect.top;
+
+        // Apply transform for smoother animation.
+        // We combine the mouse position translation with the centering translation.
+        cursorShadowRef.current.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
       }
+      // Request the next animation frame
+      animationFrameId = requestAnimationFrame(updateCursorShadow);
     };
-    
+
+    // Event handler for mouse movement
+    const handleMouseMove = (e: MouseEvent) => {
+      // Store the global mouse position in the ref, don't update state directly
+      latestMousePosition.current = { x: e.clientX, y: e.clientY };
+    };
+
+    // Add event listener and start the animation loop
     window.addEventListener('mousemove', handleMouseMove);
+    animationFrameId = requestAnimationFrame(updateCursorShadow);
+
+    // Cleanup function for when the component unmounts
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrameId); // Cancel the animation frame to prevent memory leaks
     };
-  }, [isMobile]);
+  }, [isMobile]); // Re-run effect if isMobile changes
 
   interface IconConfig {
     Icon: ElementType;
@@ -220,11 +94,12 @@ export function Hero() {
     { Icon: Globe, color: "text-green-600 dark:text-green-400", delay: 0.3 },
     { Icon: Zap, color: "text-amber-600 dark:text-amber-400", delay: 0.4 },
   ];
-  
+
   return (
     <>
-      <AdaptiveCursor />
+      <ArcadeCursor /> {/* Your custom cursor component */}
       <section ref={heroRef as React.RefObject<HTMLElement>} className="relative pt-28 md:pt-32 pb-20 md:pb-32 overflow-hidden">
+        {/* Decorative semi-circle background element */}
         <div className="absolute -right-1/4 top-1/2 -translate-y-1/2 w-2/3 aspect-square">
           <div className="relative w-full h-full">
             <div className="absolute inset-0 rounded-full border-[1px] border-slate-200 dark:border-primary/20"></div>
@@ -235,24 +110,24 @@ export function Hero() {
             <div className="absolute top-1/2 left-0 -translate-y-1/2 w-6 h-6 rounded-full bg-blue-500 dark:bg-primary shadow-[0_0_20px_8px_rgba(59,130,246,0.5)] dark:shadow-[0_0_30px_10px_rgba(56,189,248,0.4)]"></div>
           </div>
         </div>
-          
+
         {/* Dynamic light following cursor - hidden on mobile */}
         {!isMobile && (
-          <div 
-            className="hidden lg:block absolute w-96 h-96 rounded-full bg-gradient-to-r from-blue-400/10 to-purple-500/10 dark:from-blue-400/20 dark:to-purple-500/20 blur-3xl"
+          <div
+            ref={cursorShadowRef}
+            className="hidden lg:block absolute w-96 h-96 rounded-full bg-gradient-to-r from-blue-400/10 to-purple-500/10 dark:from-blue-400/20 dark:to-purple-500/20 blur-3xl pointer-events-none" // Added pointer-events-none
             style={{
-              left: `${mousePosition.x}px`,
-              top: `${mousePosition.y}px`,
-              transform: 'translate(-50%, -50%)',
-              transition: 'left 0.5s cubic-bezier(0.22, 1, 0.36, 1), top 0.5s cubic-bezier(0.22, 1, 0.36, 1)'
+              // Removed left/top as positioning is now handled by transform
+              // Transition for smoother movement of the transform property
+              transition: 'transform 0.1s ease-out',
             }}
           />
         )}
-          
+
         {/* Gradient orbs */}
         <div className="absolute top-1/4 left-10 w-64 h-64 bg-blue-300/20 dark:bg-primary/10 rounded-full blur-3xl opacity-30"></div>
         <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-purple-300/20 dark:bg-accent/10 rounded-full blur-3xl opacity-30"></div>
-          
+
         {/* Grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(56,189,248,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.03)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
 
@@ -269,9 +144,9 @@ export function Hero() {
                 <span className="flex h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse"></span>
                 <span className="text-sm font-medium">Available for new projects</span>
               </div>
-              
+
               <h1 className="h1 mb-6 tracking-tight">
-                Crafting exceptional 
+                Crafting exceptional
                 <span className="relative block mt-1 mb-1">
                   <span data-cursor-interactive className="relative z-10 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-primary dark:to-purple-500 bg-clip-text text-transparent">
                     digital experiences
@@ -279,21 +154,21 @@ export function Hero() {
                   <span className="absolute bottom-0 left-0 z-0 h-3 w-full bg-blue-100 dark:bg-primary/10 rounded"></span>
                 </span>
                 <span className="flex items-center">
-                  with 
+                  with
                   <span className="relative ml-2 inline-block overflow-hidden">
-                    <AnimatedText 
+                    <AnimatedText
                       text={skills[currentSkillIndex]}
                       className="text-blue-600 dark:text-blue-400 font-bold"
                     />
                   </span>
                 </span>
               </h1>
-              
+
               <p className="text-lg text-slate-600 dark:text-muted-foreground mb-8 max-w-xl">
-                I build premium, conversion-focused websites that help businesses grow, 
+                I build premium, conversion-focused websites that help businesses grow,
                 using modern technologies to create fast, accessible, and visually engaging experiences.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button data-cursor-interactive size="lg" asChild className="bg-blue-600 hover:bg-blue-700 dark:bg-primary dark:hover:bg-primary/90 shadow-lg shadow-blue-500/20 dark:shadow-primary/20 transition-all">
                   <Link href="/portfolio">
@@ -305,7 +180,7 @@ export function Hero() {
                     <Link href="/contact">Let's work together</Link>
                 </Button>
               </div>
-              
+
               {/* Skill icons */}
               <div className="mt-12 hidden md:flex items-center gap-4">
                 {icons.map(({ Icon, color, delay }, index) => (
@@ -332,7 +207,7 @@ export function Hero() {
                 </motion.div>
               </div>
             </motion.div>
-            
+
             {/* Right animated developer card/terminal */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -343,7 +218,7 @@ export function Hero() {
               <div className="relative">
                 {/* Backdrop glow */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-300/30 to-purple-300/30 dark:from-primary/20 dark:to-purple-500/20 rounded-2xl blur-md"></div>
-                
+
                 {/* Terminal window */}
                 <div className="relative rounded-xl overflow-hidden border border-blue-200 dark:border-primary/20 bg-white/90 dark:bg-black/80 backdrop-blur-xl shadow-2xl">
                   <div className="p-4 sm:p-6 h-full flex flex-col">
@@ -355,7 +230,7 @@ export function Hero() {
                       </div>
                       <div className="text-xs text-slate-400 dark:text-muted-foreground">developer.profile</div>
                     </div>
-                    
+
                     <div className="flex-1 flex items-center justify-center p-4">
                       <div className="font-mono text-sm sm:text-base bg-slate-50 dark:bg-black/40 text-slate-800 dark:text-primary-foreground p-6 rounded-md w-full border border-slate-200 dark:border-white/5">
                         <motion.div
@@ -369,7 +244,7 @@ export function Hero() {
                             <span className="text-green-700 dark:text-green-400">developer</span> ={" "}
                             {"{"}
                           </p>
-                          <motion.p 
+                          <motion.p
                             data-cursor-interactive
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -379,7 +254,7 @@ export function Hero() {
                             <span className="text-amber-700 dark:text-yellow-400">name</span>:{" "}
                             <span className="text-orange-700 dark:text-orange-400">'Nitin Sharma'</span>,
                           </motion.p>
-                          <motion.p 
+                          <motion.p
                             data-cursor-interactive
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -389,7 +264,7 @@ export function Hero() {
                             <span className="text-amber-700 dark:text-yellow-400">title</span>:{" "}
                             <span className="text-orange-700 dark:text-orange-400">'Frontend Developer'</span>,
                           </motion.p>
-                          <motion.p 
+                          <motion.p
                             data-cursor-interactive
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -399,7 +274,7 @@ export function Hero() {
                             <span className="text-amber-700 dark:text-yellow-400">currentSkill</span>:{" "}
                             <span className="relative flex items-center">
                               <span className="text-orange-700 dark:text-orange-400">'</span>
-                              <AnimatedText 
+                              <AnimatedText
                                 text={skills[currentSkillIndex]}
                                 className="text-orange-700 dark:text-orange-400"
                               />
@@ -407,7 +282,7 @@ export function Hero() {
                               <span className="ml-1 animate-pulse text-blue-600 dark:text-primary">|</span>
                             </span>
                           </motion.p>
-                          <motion.p 
+                          <motion.p
                             data-cursor-interactive
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -417,7 +292,7 @@ export function Hero() {
                             <span className="text-amber-700 dark:text-yellow-400">available</span>:{" "}
                             <span className="text-purple-700 dark:text-purple-400">true</span>,
                           </motion.p>
-                          <motion.p 
+                          <motion.p
                             data-cursor-interactive
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -433,9 +308,9 @@ export function Hero() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Floating elements */}
-                <motion.div 
+                <motion.div
                   data-cursor-interactive
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -447,8 +322,8 @@ export function Hero() {
                     <span className="text-xs font-medium">Online & Available</span>
                   </div>
                 </motion.div>
-                
-                <motion.div 
+
+                <motion.div
                   data-cursor-interactive
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
