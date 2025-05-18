@@ -2,6 +2,8 @@
 
 import './globals.css';
 import { Inter } from 'next/font/google';
+import './globals.css'; // Make sure your global.css is imported
+import { GlobalCursorShadow } from '@/components/GlobalCursorShadow'; // Adjust path as needed 
 import { ThemeProvider } from '@/components/theme-provider';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
@@ -20,6 +22,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="Nitin Sharma | Freelance Web Developer" />
+        <meta name="keywords" content="Nitin Sharma, Freelance Web Developer, React, Next.js, JavaScript" />
+        <meta name="author" content="Nitin Sharma" />
+        <link rel="icon" href="/Portfolio_logo.webp" />
         <style>
           {`
           .light {
@@ -44,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Footer />
           </div>
           <Toaster />
+          <GlobalCursorShadow /> 
           <ArcadeCursor />
         </ThemeProvider>
       </body>
