@@ -1,0 +1,371 @@
+/* global.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import professional fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 250, 250, 252;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 15, 23, 42;
+    --background-end-rgb: 10, 15, 30;
+  }
+}
+
+@layer base {
+  :root {
+    /* Refined color palette with elegant tones */
+    --background: 220 33% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 222 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 215 25% 27%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 215 16% 97%;
+    --muted-foreground: 215 25% 40%;
+    --accent: 25 95% 53%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 222 83% 53%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  
+  .dark {
+    /* Sophisticated dark mode palette */
+    --background: 222 47% 9%;
+    --foreground: 213 31% 91%;
+    --card: 222 47% 11%;
+    --card-foreground: 213 31% 91%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 221 83% 65%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 33% 20%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 70%;
+    --accent: 25 95% 53%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 221 83% 65%;
+    --chart-1: 220 70% 60%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    font-family: 'Inter', sans-serif;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground relative;
+    background-image: radial-gradient(
+      circle at top right,
+      hsl(var(--background) / 0.8) 0%,
+      hsl(var(--background)) 100%
+    );
+  }
+  
+  /* Enhanced Typography System */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    @apply tracking-tight;
+  }
+  
+  .h1 {
+    @apply text-4xl font-bold leading-tight md:text-5xl lg:text-6xl;
+    letter-spacing: -0.03em;
+  }
+  
+  .h2 {
+    @apply text-3xl font-bold leading-tight md:text-4xl;
+    letter-spacing: -0.02em;
+  }
+  
+  .h3 {
+    @apply text-2xl font-bold leading-tight md:text-3xl;
+    letter-spacing: -0.01em;
+  }
+  
+  .h4 {
+    @apply text-xl font-semibold leading-tight md:text-2xl;
+  }
+  
+  .p-large {
+    @apply text-lg leading-relaxed font-light md:text-xl;
+  }
+  
+  .p-base {
+    @apply text-base leading-relaxed;
+  }
+  
+  .p-small {
+    @apply text-sm leading-relaxed;
+  }
+  
+  /* Focus states for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background transition-all;
+  }
+}
+
+@layer components {
+  /* Layout Components */
+  .container-custom {
+    @apply mx-auto w-full max-w-screen-xl px-5 md:px-10;
+  }
+  
+  .section-padding {
+    @apply py-16 md:py-24 lg:py-32;
+  }
+  
+  /* Enhanced Button Styles */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/90;
+  }
+  
+  .btn-outline {
+    @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
+  }
+  
+  /* Interactive Elements */
+  .cursor-ring {
+    @apply pointer-events-none fixed z-50 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary transition-all duration-150 ease-out;
+  }
+  
+  .highlight {
+    @apply relative inline-block after:absolute after:bottom-0 after:left-0 after:h-3 after:w-full after:-z-10 after:bg-accent/20 after:rounded;
+  }
+  
+  /* Elegant card styling */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+  
+  /* Section Elements */
+  .section-title {
+    @apply relative mb-12 pb-4 inline-block;
+  }
+  
+  .section-title::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-16 h-1 bg-primary rounded-full;
+  }
+  
+  /* Grid layouts */
+  .auto-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8;
+  }
+  
+  /* Animation Classes */
+  .fade-in {
+    @apply opacity-0 transition-opacity duration-700;
+  }
+  
+  .fade-in.appear {
+    @apply opacity-100;
+  }
+  
+  .slide-up {
+    @apply translate-y-10 opacity-0 transition-all duration-700 ease-out;
+  }
+  
+  .slide-up.appear {
+    @apply translate-y-0 opacity-100;
+  }
+  
+  .scale-in {
+    @apply scale-95 opacity-0 transition-all duration-500 ease-out;
+  }
+  
+  .scale-in.appear {
+    @apply scale-100 opacity-100;
+  }
+  
+  /* Elegant divider */
+  .elegant-divider {
+    @apply my-16 h-px w-full bg-gradient-to-r from-transparent via-border to-transparent;
+  }
+  
+  /* Badge component */
+  .badge {
+    @apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+
+  /* NEW: Global Cursor Shadow Effect */
+  .global-cursor-shadow {
+    position: fixed; /* Position relative to the viewport */
+    width: 24rem;    /* 384px (w-96) */
+    height: 24rem;   /* 384px (h-96) */
+    border-radius: 9999px; /* rounded-full */
+    filter: blur(3rem); /* blur-3xl */
+    pointer-events: none; /* Allows clicks/interactions on elements beneath it */
+    z-index: 9999;       /* Ensures it's always on top */
+    transition: transform 0.1s ease-out; /* Smoother movement */
+    opacity: 0;          /* Initially hidden, will be set to opacity: 1 by JS when active */
+
+    /* Light mode gradient */
+    background: linear-gradient(to right,
+      rgba(96, 165, 250, 0.1) /* blue-400/10 */,
+      rgba(168, 85, 247, 0.1) /* purple-500/10 */
+    );
+  }
+
+  /* Dark mode gradient for the global cursor shadow */
+  .dark .global-cursor-shadow {
+    background: linear-gradient(to right,
+      rgba(96, 165, 250, 0.2) /* blue-400/20 */,
+      rgba(168, 85, 247, 0.2) /* purple-500/20 */
+    );
+  }
+}
+
+@layer utilities {
+  /* Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  *::-webkit-scrollbar-track {
+    @apply bg-muted/50 rounded-full;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    @apply bg-primary/30 rounded-full hover:bg-primary/50 transition-colors;
+  }
+  
+  /* Glass effect utility */
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 dark:bg-black/20 dark:border-white/10;
+  }
+  
+  /* Text gradient effect */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+  }
+  
+  /* Subtle background pattern */
+  .bg-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  
+  /* Selection styling */
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+}
+
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Progress bar animation */
+@keyframes progress {
+  0% { width: 0; }
+  100% { width: 100%; }
+}
+
+.animate-progress {
+  animation: progress 1.5s ease-out forwards;
+}
+
+/* Custom shape dividers for sections */
+.shape-divider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.shape-divider svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 69px;
+}
+
+.shape-divider .shape-fill {
+  fill: hsl(var(--background));
+}
+
+/* Print styles */
+@media print {
+  body {
+    @apply bg-white text-black;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+}
+
+.light-theme {
+  cursor: url('/assets/icons/Icon.png'), auto;
+}
+
+.dark-theme {
+  cursor: url('/assets/icons/Icon2.png'), auto;
+}
